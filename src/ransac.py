@@ -163,7 +163,6 @@ class RANSAC:
         return d
 
     def execute_ransac(self):
-        # find best model
         start_time = time.time()
         for i in range(self.n):
             curr_sample = self.sample_points()
