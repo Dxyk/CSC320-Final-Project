@@ -3,7 +3,7 @@ import numpy.random
 import matplotlib.pyplot as plt
 
 from .data_generation import generate_circle, generate_noise
-from .ransac import RANSAC
+from .ransac import Ransac
 
 # ========== Constants ==========
 NUM_CIRCLE_DATA = 100
@@ -47,28 +47,28 @@ if __name__ == "__main__":
     plt.scatter(x, y, c="blue", marker=".", label="data")
 
     # ===== RANSAC =====
-    # ransac = RANSAC(x, y, 50, CIRCLE_NOISE, baysac=False)
-    # ransac.execute_ransac()
+    ransac = Ransac(x, y, 50, CIRCLE_NOISE, baysac=False)
+    ransac.execute_ransac()
 
-    # c_x, c_y, r = ransac.best_model[0], ransac.best_model[1], ransac.best_model[2]
-
-    # circle = plt.Circle((c_x, c_y), radius=r, color="r", fc="y", fill=False)
-    # plt.gca().add_patch(circle)
-    # plt.axis("scaled")
-    # plt.show()
-    # plt.savefig("./out/ransac.png")
-    # plt.clf()
-
-    # ===== BAYSAC =====
-    baysac = RANSAC(x, y, 50, CIRCLE_NOISE, baysac=True)
-
-    baysac.execute_ransac()
-
-    c_x, c_y, r = baysac.best_model[0], baysac.best_model[1], baysac.best_model[2]
+    c_x, c_y, r = ransac.best_model[0], ransac.best_model[1], ransac.best_model[2]
 
     circle = plt.Circle((c_x, c_y), radius=r, color="r", fc="y", fill=False)
     plt.gca().add_patch(circle)
     plt.axis("scaled")
     plt.show()
-    plt.savefig("./out/baysac.png")
+    plt.savefig("./out/ransac.png")
     plt.clf()
+
+    # ===== BAYSAC =====
+    # baysac = Ransac(x, y, 50, CIRCLE_NOISE, baysac=True)
+
+    # baysac.execute_ransac()
+
+    # c_x, c_y, r = baysac.best_model[0], baysac.best_model[1], baysac.best_model[2]
+
+    # circle = plt.Circle((c_x, c_y), radius=r, color="r", fc="y", fill=False)
+    # plt.gca().add_patch(circle)
+    # plt.axis("scaled")
+    # plt.show()
+    # plt.savefig("./out/baysac.png")
+    # plt.clf()
