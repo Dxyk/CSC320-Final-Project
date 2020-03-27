@@ -47,7 +47,7 @@ if __name__ == "__main__":
     plt.scatter(x, y, c="blue", marker=".", label="data")
 
     # ===== RANSAC =====
-    ransac = RANSAC(x, y, 50, baysac=False)
+    ransac = RANSAC(x, y, 50, CIRCLE_NOISE, baysac=False)
     ransac.execute_ransac()
 
     c_x, c_y, r = ransac.best_model[0], ransac.best_model[1], ransac.best_model[2]
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     plt.clf()
 
     # ===== BAYSAC =====
-    # baysac = RANSAC(x, y, 50, baysac=True)
+    # baysac = RANSAC(x, y, 50, CIRCLE_NOISE, baysac=True)
 
     # baysac.execute_ransac()
 

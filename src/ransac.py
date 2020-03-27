@@ -11,6 +11,7 @@ class RANSAC:
         x_data (np.ndarray): a list of points' x coordinates
         y_data (np.ndarray): a list of points' y coordinates
         n (int): maximum number of iterations to run
+        threshold (float): the threshold to determine if a points is an inlier
         baysac (bool): true if use BAYSAC, otherwise use RANSAC
         d_min (int): the minimum distance learned from the algorithm
         best_model (Tuple[int]): the best model so far
@@ -18,20 +19,23 @@ class RANSAC:
             index i is an inlier
         bayes_idx (np.ndarray): a list of indices that match the likelihoods
             to the point coordinates
+        inliers (Set[Tuple[float]]): the coordinates that are inliers
     """
 
-    def __init__(self, x_data, y_data, n, baysac=False):
+    def __init__(self, x_data, y_data, n, threshold, baysac=False):
         assert x_data.shape == y_data.shape, \
             "x_data: {0}, y_data: {1}".format(x_data.shape, y_data.shape)
+        # TODO: we may want to calculate n instead of defining it
         self.x_data = x_data
         self.y_data = y_data
         self.n = n
+        self.threshold = threshold
         self.baysac = baysac
         self.d_min = 99999
         self.best_model = None
         self.bayes_probs = np.repeat(0.5, x_data.shape[0])
         self.bayes_idx = np.arange(x_data.shape[0])
-        self.s_in = set()
+        self.inliers = set()
 
     def sample_points(self):
         """
@@ -80,7 +84,8 @@ class RANSAC:
         self.bayes_idx = np.argsort(self.bayes_probs)
 
         for i in range(3):
-            # TODO: randomize max
+            # TODO: there could be multiple points with likelihoods that are max
+            # we may want to randomize between those points
             curr_idx = self.bayes_idx[i]
 
             sample.append((self.x_data[curr_idx], self.y_data[curr_idx]))
@@ -113,31 +118,6 @@ class RANSAC:
 
         return c_x, c_y, r
 
-    def eval_model_old(self, model):
-        """
-        Evaluates the model and calculates the total difference of each point
-        being away from the data
-
-        Args:
-            model (Tuple[float]): the centre points' x, y coord and the radius
-
-        Returns:
-            float: the total difference of each point being away from the data
-        """
-        d = 0
-        c_x, c_y, r = model
-
-        for i in range(len(self.x_data)):
-            dis = np.sqrt((self.x_data[i] - c_x) ** 2 +
-                          (self.y_data[i] - c_y) ** 2)
-
-            if dis >= r:
-                d += dis - r
-            else:
-                d += r - dis
-
-        return d
-
     def eval_model(self, model):
         """
         Evaluates the model and calculates the total difference of each point
@@ -149,19 +129,23 @@ class RANSAC:
         Returns:
             float: the total difference of each point being away from the data
         """
-        d = 0
         c_x, c_y, r = model
+        inliers = set()
 
         for i in range(len(self.x_data)):
-            dis = np.sqrt((self.x_data[i] - c_x) ** 2 +
-                          (self.y_data[i] - c_y) ** 2)
+            curr_x = self.x_data[i]
+            curr_y = self.y_data[i]
 
-            if dis >= r:
-                d += dis - r
-            else:
-                d += r - dis
+            dist = np.sqrt((self.x_data[i] - c_x) ** 2 +
+                           (self.y_data[i] - c_y) ** 2) - r
 
-        return d
+            if abs(dist) < self.threshold:
+                inliers.add((curr_x, curr_y))
+
+        if len(inliers) > len(self.inliers):
+            self.inliers = inliers
+            self.best_model = model
+        return
 
     def bayes_eval_model(self, model):
         d = 0
@@ -184,10 +168,6 @@ class RANSAC:
         for i in range(self.n):
             curr_sample = self.sample_points()
             model = self.make_model(curr_sample)
-            d_temp = self.eval_model(model)
-
-            if self.d_min > d_temp:
-                self.best_model = model
-                self.d_min = d_temp
+            self.eval_model(model)
         end_time = time.time()
         print "time elapsed: {0}".format(end_time - start_time)
