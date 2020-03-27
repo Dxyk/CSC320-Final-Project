@@ -44,7 +44,6 @@ def generate_data():
 if __name__ == "__main__":
     # data generation
     x, y = generate_data()
-    plt.scatter(x, y, c="blue", marker=".", label="data")
 
     # ===== RANSAC =====
     ransac = Ransac(x, y, 50, CIRCLE_NOISE, baysac=False)
@@ -53,6 +52,8 @@ if __name__ == "__main__":
     c_x, c_y, r = ransac.best_model[0], ransac.best_model[1], ransac.best_model[2]
 
     circle = plt.Circle((c_x, c_y), radius=r, color="r", fc="y", fill=False)
+
+    plt.scatter(x, y, c="blue", marker=".", label="data")
     plt.gca().add_patch(circle)
     plt.axis("scaled")
     plt.show()
@@ -60,15 +61,17 @@ if __name__ == "__main__":
     plt.clf()
 
     # ===== BAYSAC =====
-    # baysac = Ransac(x, y, 50, CIRCLE_NOISE, baysac=True)
+    baysac = Ransac(x, y, 50, CIRCLE_NOISE, baysac=True)
 
-    # baysac.execute_ransac()
+    baysac.execute_ransac()
 
-    # c_x, c_y, r = baysac.best_model[0], baysac.best_model[1], baysac.best_model[2]
+    c_x, c_y, r = baysac.best_model[0], baysac.best_model[1], baysac.best_model[2]
 
-    # circle = plt.Circle((c_x, c_y), radius=r, color="r", fc="y", fill=False)
-    # plt.gca().add_patch(circle)
-    # plt.axis("scaled")
-    # plt.show()
-    # plt.savefig("./out/baysac.png")
-    # plt.clf()
+    circle = plt.Circle((c_x, c_y), radius=r, color="r", fc="y", fill=False)
+
+    plt.scatter(x, y, c="blue", marker=".", label="data")
+    plt.gca().add_patch(circle)
+    plt.axis("scaled")
+    plt.show()
+    plt.savefig("./out/baysac.png")
+    plt.clf()

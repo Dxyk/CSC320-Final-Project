@@ -84,7 +84,8 @@ class Ransac:
         Returns:
             List[int]: 3 points' indices using with maximum likelihood
         """
-        indices = np.argsort(self.likelihoods)
+        # sort in decreasing order
+        indices = np.argsort(self.likelihoods)[::-1]
         sample_indices = indices[:3]
 
         return sample_indices
@@ -146,9 +147,10 @@ class Ransac:
         return
 
     def update_likelihoods(self, sample_indices):
-        # P(H_t not subset of Inliers) = 1 - P(H_t subset of Inliers)
         curr_likelihoods = self.likelihoods[sample_indices]
-        # p_sample_not_inlier = 1 - np.prod()
+        p_sample_subset_inlier = np.prod(curr_likelihoods)
+        self.likelihoods[sample_indices] = (curr_likelihoods - p_sample_subset_inlier) / \
+            (1 - p_sample_subset_inlier)
         return
 
     def execute_ransac(self):
