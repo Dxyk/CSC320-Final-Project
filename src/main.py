@@ -41,37 +41,48 @@ def generate_data():
     return x, y
 
 
+def run_ransac(x, y, save_file_name, is_baysac=False):
+    ransac = Ransac(x, y, 50, CIRCLE_NOISE, is_baysac=is_baysac)
+    ransac.execute_ransac()
+
+    print(ransac.get_min_average_dist())
+
+    best_model = ransac.get_best_model()
+    c_x, c_y, r = best_model[0], best_model[1], best_model[2]
+    x_inlier, y_inlier = zip(*list(ransac.get_inliers()))
+
+    plt.scatter(
+        x, y,
+        c="blue",
+        marker=".",
+        label="data"
+    )
+    plt.scatter(
+        x_inlier, y_inlier,
+        facecolors='none',
+        edgecolors='lime',
+        label="inliers"
+    )
+    circle = plt.Circle(
+        (c_x, c_y),
+        radius=r,
+        color="red",
+        fill=False
+    )
+    plt.gca().add_patch(circle)
+    plt.axis("scaled")
+    plt.savefig("./out/{0}.png".format(save_file_name))
+    plt.show()
+    plt.clf()
+    return ransac
+
+
 if __name__ == "__main__":
     # data generation
     x, y = generate_data()
 
-    # ===== RANSAC =====
-    ransac = Ransac(x, y, 50, CIRCLE_NOISE, baysac=False)
-    ransac.execute_ransac()
+    # ransac
+    ransac = run_ransac(x, y, "ransac", is_baysac=False)
 
-    c_x, c_y, r = ransac.best_model[0], ransac.best_model[1], ransac.best_model[2]
-
-    circle = plt.Circle((c_x, c_y), radius=r, color="r", fc="y", fill=False)
-
-    plt.scatter(x, y, c="blue", marker=".", label="data")
-    plt.gca().add_patch(circle)
-    plt.axis("scaled")
-    plt.show()
-    plt.savefig("./out/ransac.png")
-    plt.clf()
-
-    # ===== BAYSAC =====
-    baysac = Ransac(x, y, 50, CIRCLE_NOISE, baysac=True)
-
-    baysac.execute_ransac()
-
-    c_x, c_y, r = baysac.best_model[0], baysac.best_model[1], baysac.best_model[2]
-
-    circle = plt.Circle((c_x, c_y), radius=r, color="r", fc="y", fill=False)
-
-    plt.scatter(x, y, c="blue", marker=".", label="data")
-    plt.gca().add_patch(circle)
-    plt.axis("scaled")
-    plt.show()
-    plt.savefig("./out/baysac.png")
-    plt.clf()
+    # baysac
+    baysac = run_ransac(x, y, "baysac", is_baysac=True)

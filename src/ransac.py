@@ -12,9 +12,9 @@ class Ransac:
         y_data (np.ndarray): a list of points' y coordinates
         n (int): maximum number of iterations to run
         threshold (float): the threshold to determine if a points is an inlier
-        baysac (bool): true if use BAYSAC, otherwise use RANSAC
-        d_min (int): the minimum distance learned from the algorithm
-        best_model (Tuple[int]): the best model so far
+        is_baysac (bool): true if use BAYSAC, otherwise use RANSAC
+        min_dist (int): the minimum distance learned by the algorithm
+        best_model (Tuple[float]): the best model so far
         likelihoods (np.ndarray): a list of likelihoods that the point at
             index i is an inlier
         bayes_idx (np.ndarray): a list of indices that match the likelihoods
@@ -22,7 +22,7 @@ class Ransac:
         inliers (Set[Tuple[float]]): the coordinates that are inliers
     """
 
-    def __init__(self, x_data, y_data, n, threshold, baysac=False):
+    def __init__(self, x_data, y_data, n, threshold, is_baysac=False):
         assert x_data.shape == y_data.shape, "x and y shapes must match." + \
             "x_data: {0}, y_data: {1}.".format(x_data.shape, y_data.shape)
         assert x_data.shape[0] >= 3, "there must be at least 3 data " + \
@@ -33,9 +33,9 @@ class Ransac:
         self.y_data = y_data
         self.n = n
         self.threshold = threshold
-        self.baysac = baysac
-        self.d_min = 99999
-        self.best_model = None
+        self.is_baysac = is_baysac
+        self.min_dist = float("inf")
+        self.best_model = (0., 0., 0.)
         self.likelihoods = np.repeat(0.5, x_data.shape[0])
         self.inliers = set()
 
@@ -46,7 +46,7 @@ class Ransac:
         Returns:
             List[int]: 3 points' indices
         """
-        if self.baysac:
+        if self.is_baysac:
             return self._likelihood_sampling()
         else:
             return self._random_sampling()
@@ -54,7 +54,7 @@ class Ransac:
     def _random_sampling(self):
         """
         Sample 3 points' indices using random sampling.
-        Used when self.baysac is false.
+        Used when self.is_baysac is false.
 
         Returns:
             List[int]: 3 points' indices using random samping
@@ -62,24 +62,11 @@ class Ransac:
         indices = np.indices(self.x_data.shape)[0]
         sample_indices = np.random.choice(indices, 3, replace=False)
         return sample_indices
-        # sample = []
-        # save_idx = []
-        # count = 0
-
-        # # get three points from data
-        # while count < 3:
-        #     curr_idx = np.random.randint(len(self.x_data))
-
-        #     if curr_idx not in sample:
-        #         sample.append(curr_idx)
-        #         count += 1
-
-        # return sample
 
     def _likelihood_sampling(self):
         """
         Sample 3 points' indices using highest likelihoods.
-        Used when self.baysac is True.
+        Used when self.is_baysac is True.
 
         Returns:
             List[int]: 3 points' indices using with maximum likelihood
@@ -130,6 +117,7 @@ class Ransac:
         """
         c_x, c_y, r = model
         inliers = set()
+        curr_dist_total = 0
 
         for i in range(len(self.x_data)):
             curr_x = self.x_data[i]
@@ -138,15 +126,26 @@ class Ransac:
             dist = np.sqrt((self.x_data[i] - c_x) ** 2 +
                            (self.y_data[i] - c_y) ** 2) - r
 
-            if abs(dist) < self.threshold:
+            dist = abs(dist)
+
+            if dist < self.threshold:
                 inliers.add((curr_x, curr_y))
+
+            curr_dist_total += dist
 
         if len(inliers) > len(self.inliers):
             self.inliers = inliers
             self.best_model = model
+            self.min_dist = curr_dist_total
         return
 
     def update_likelihoods(self, sample_indices):
+        """
+        Update the likelihoods given the current sample indices
+
+        Args:
+            sample_indices (List[int]): the 3 sample points' indices
+        """
         curr_likelihoods = self.likelihoods[sample_indices]
         p_sample_subset_inlier = np.prod(curr_likelihoods)
         self.likelihoods[sample_indices] = (curr_likelihoods - p_sample_subset_inlier) / \
@@ -154,12 +153,51 @@ class Ransac:
         return
 
     def execute_ransac(self):
+        """
+        The top level method for executing ransac algorithm
+        """
         start_time = time.time()
         for i in range(self.n):
             curr_sample_indices = self.sample_indices()
             model = self.make_model(curr_sample_indices)
             self.eval_model(model)
-            if self.baysac:
+            if self.is_baysac:
                 self.update_likelihoods(curr_sample_indices)
         end_time = time.time()
         print "time elapsed: {0}".format(end_time - start_time)
+        return
+
+    def get_best_model(self):
+        """
+        Get the best model
+
+        Returns:
+            Tuple[float]: the best model
+        """
+        return self.best_model
+
+    def get_inliers(self):
+        """
+        Get the set of inlier points
+
+        Returns:
+            Set[Tuple[Float]]: the set of inlier points
+        """
+        return self.inliers
+
+    def get_min_dist(self):
+        """
+        Get the minimum total distance from all points to the circle
+
+        Returns:
+            float: the minimum total distance from all points to the circle
+        """
+        return self.min_dist
+
+    def get_min_average_dist(self):
+        """Get the minimum total distance averaged over the points
+
+        Returns:
+            float: the minimum total distance averaged over the points
+        """
+        return self.min_dist / len(self.x_data)

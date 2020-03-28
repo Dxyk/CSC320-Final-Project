@@ -1,6 +1,7 @@
 # Project specific
 **/.vscode/*
 **/.idea/*
+./out/*
 
 # ===== Python =====
 # Byte-compiled / optimized / DLL files
