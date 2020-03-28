@@ -39,8 +39,8 @@ def generate_noise(num_samples=20, noise=1, x_bound=1.5, y_bound=1.5):
     Returns:
         Tuple[np.ndarray]: the x, y coordinates of the points
     """
-    x_noise = np.clip(np.random.randn(num_samples) * noise, -x_bound, x_bound)
-    y_noise = np.clip(np.random.randn(num_samples) * noise, -y_bound, y_bound)
+    x_noise = np.random.randn(num_samples) * noise
+    y_noise = np.random.randn(num_samples) * noise
     return x_noise, y_noise
 
 

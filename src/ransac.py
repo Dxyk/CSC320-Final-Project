@@ -20,6 +20,7 @@ class Ransac:
         bayes_idx (np.ndarray): a list of indices that match the likelihoods
             to the point coordinates
         inliers (Set[Tuple[float]]): the coordinates that are inliers
+        runtime (float): the runtime for execute_ransac
     """
 
     def __init__(self, x_data, y_data, n, threshold, is_baysac=False):
@@ -38,6 +39,7 @@ class Ransac:
         self.best_model = (0., 0., 0.)
         self.likelihoods = np.repeat(0.5, x_data.shape[0])
         self.inliers = set()
+        self.runtime = 0.
 
     def sample_indices(self):
         """
@@ -123,10 +125,7 @@ class Ransac:
             curr_x = self.x_data[i]
             curr_y = self.y_data[i]
 
-            dist = np.sqrt((self.x_data[i] - c_x) ** 2 +
-                           (self.y_data[i] - c_y) ** 2) - r
-
-            dist = abs(dist)
+            dist = abs(np.sqrt((curr_x - c_x) ** 2 + (curr_y - c_y) ** 2) - r)
 
             if dist < self.threshold:
                 inliers.add((curr_x, curr_y))
@@ -164,7 +163,7 @@ class Ransac:
             if self.is_baysac:
                 self.update_likelihoods(curr_sample_indices)
         end_time = time.time()
-        print "time elapsed: {0}".format(end_time - start_time)
+        self.runtime = end_time - start_time
         return
 
     def get_best_model(self):
@@ -185,19 +184,39 @@ class Ransac:
         """
         return self.inliers
 
-    def get_min_dist(self):
+    def get_total_dist(self):
         """
-        Get the minimum total distance from all points to the circle
+        Get the total distance from all points to the circle
 
         Returns:
-            float: the minimum total distance from all points to the circle
+            float: the total distance from all points to the circle
         """
         return self.min_dist
 
-    def get_min_average_dist(self):
-        """Get the minimum total distance averaged over the points
+    def get_inlier_dist(self):
+        """
+        Get the total distance from all inlier points to the circle
 
         Returns:
-            float: the minimum total distance averaged over the points
+            float: the total distance from all inliers to the circle
         """
-        return self.min_dist / len(self.x_data)
+        c_x, c_y, r = self.best_model
+        x_inlier, y_inlier = zip(*list(self.inliers))
+        total_dist = 0
+        for i in range(len(self.inliers)):
+            curr_x = x_inlier[i]
+            curr_y = y_inlier[i]
+
+            dist = abs(np.sqrt((curr_x - c_x) ** 2 + (curr_y - c_y) ** 2) - r)
+
+            total_dist += dist
+        return total_dist
+
+    def get_runtime(self):
+        """
+        Get the runtime for execute_ransac method
+
+        Returns:
+            float: the runtime for execute_ransac method
+        """
+        return self.runtime
