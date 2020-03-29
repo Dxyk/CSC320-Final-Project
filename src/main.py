@@ -177,7 +177,7 @@ def run_ransac_10_times(num_circle_data, circle_noise,
             ransac_accuracy.append(0.)
 
         # baysac
-        baysac = Ransac(x, y, num_iters, circle_noise, is_baysac=False)
+        baysac = Ransac(x, y, num_iters, circle_noise, is_baysac=true)
         baysac.execute_ransac()
         if PLOT:
             plot_ransac(x, y, baysac,
