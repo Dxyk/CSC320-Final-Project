@@ -26,7 +26,7 @@ def generate_circle(num_samples=100, noise=0.1):
     return x, y
 
 
-def generate_noise(num_samples=20, noise=1, x_bound=1.5, y_bound=1.5):
+def generate_noise(num_samples=20, noise=1):
     """
     Generate the x, y coordinates of normal noisy points
 
