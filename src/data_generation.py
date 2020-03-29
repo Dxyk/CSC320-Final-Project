@@ -49,8 +49,6 @@ if __name__ == "__main__":
     circle_noise = 0.1
     num_noisy_sample = 20
     noisy_noise = 1
-    x_bound = 1.5
-    y_bound = 1.5
 
     x_circle, y_circle = generate_circle(
         num_samples=num_circle_sample,
@@ -58,15 +56,17 @@ if __name__ == "__main__":
     )
     x_noise, y_noise = generate_noise(
         num_samples=num_noisy_sample,
-        noise=noisy_noise,
-        x_bound=x_bound,
-        y_bound=y_bound
+        noise=noisy_noise
     )
 
     x = np.append(x_circle, x_noise)
     y = np.append(y_circle, y_noise)
 
     plt.scatter(x, y, c="blue", marker=".", label="data")
+    plt.title("Circle Finding Problem")
     plt.axis("scaled")
+    plt.margins(0, 0)
+    plt.savefig("./out/noisy_circle.png", bbox_inches='tight',
+                pad_inches=0)
     plt.show()
     plt.clf()

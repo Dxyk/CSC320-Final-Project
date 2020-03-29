@@ -69,8 +69,10 @@ def plot_ransac(x, y, fitted_ransac, save_path=""):
     )
     plt.gca().add_patch(circle)
     plt.axis("scaled")
+    plt.margins(0, 0)
     if SAVE and save_path != "":
-        plt.savefig(save_path)
+        plt.savefig(save_path, bbox_inches='tight',
+                    pad_inches=0)
     if SHOW:
         plt.show()
     return
@@ -87,8 +89,10 @@ def plot_result(res, xs, xlabel, curr_dir):
     plt.xlabel(xlabel)
     plt.ylabel("Runtime")
     plt.legend(loc="best")
+    plt.margins(0, 0)
     if SAVE:
-        plt.savefig(curr_dir + "runtime.png")
+        plt.savefig(curr_dir + "runtime.png", bbox_inches='tight',
+                    pad_inches=0)
     if SHOW:
         plt.show()
 
@@ -102,8 +106,10 @@ def plot_result(res, xs, xlabel, curr_dir):
     plt.xlabel(xlabel)
     plt.ylabel("Dist")
     plt.legend(loc="best")
+    plt.margins(0, 0)
     if SAVE:
-        plt.savefig(curr_dir + "dist.png")
+        plt.savefig(curr_dir + "dist.png", bbox_inches='tight',
+                    pad_inches=0)
     if SHOW:
         plt.show()
 
@@ -117,8 +123,10 @@ def plot_result(res, xs, xlabel, curr_dir):
     plt.xlabel(xlabel)
     plt.ylabel("Inlier Dist")
     plt.legend(loc="best")
+    plt.margins(0, 0)
     if SAVE:
-        plt.savefig(curr_dir + "inlier_dist.png")
+        plt.savefig(curr_dir + "inlier_dist.png", bbox_inches='tight',
+                    pad_inches=0)
     if SHOW:
         plt.show()
 
@@ -132,8 +140,10 @@ def plot_result(res, xs, xlabel, curr_dir):
     plt.xlabel(xlabel)
     plt.ylabel("Accuracy")
     plt.legend(loc="best")
+    plt.margins(0, 0)
     if SAVE:
-        plt.savefig(curr_dir + "accuracy.png")
+        plt.savefig(curr_dir + "accuracy.png", bbox_inches='tight',
+                    pad_inches=0)
     if SHOW:
         plt.show()
     return
@@ -238,9 +248,9 @@ if __name__ == "__main__":
     SAVE = True
 
     # run flags
-    RUN_BASELINE = False
-    RUN_RATIO = False
-    RUN_TOTAL_NUM = False
+    RUN_BASELINE = True
+    RUN_RATIO = True
+    RUN_TOTAL_NUM = True
     RUN_CIRCLE_NOISE = True
     RUN_NOISY_NOISE = True
     RUN_NUM_ITERS = True
