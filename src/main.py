@@ -1,9 +1,10 @@
 import numpy as np
 import numpy.random
-import matplotlib.pyplot as plt
-
-from .data_generation import generate_circle, generate_noise
-from .ransac import Ransac
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+from data_generation import generate_circle, generate_noise
+from ransac import Ransac
 
 # ========== Constants ==========
 
