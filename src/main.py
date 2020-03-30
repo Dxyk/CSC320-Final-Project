@@ -1,10 +1,10 @@
+from ransac import Ransac
+from data_generation import generate_circle, generate_noise
+from matplotlib import pyplot as plt
 import numpy as np
 import numpy.random
 import matplotlib
 matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-from data_generation import generate_circle, generate_noise
-from ransac import Ransac
 
 # ========== Constants ==========
 
@@ -391,7 +391,7 @@ if __name__ == "__main__":
 
     # num iters
     if RUN_NUM_ITERS:
-        curr_dir = "./out/num_iters1-200/"
+        curr_dir = "./out/num_iters2-40/"
         if not os.path.exists(curr_dir):
             os.mkdir(curr_dir)
 
