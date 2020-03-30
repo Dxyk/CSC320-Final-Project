@@ -396,7 +396,7 @@ if __name__ == "__main__":
 
         res = copy.deepcopy(empty_res)
 
-        for num_iters in np.arange(1, 220, 20):
+        for num_iters in np.arange(2, 42, 2):
             print "{0} num_iters: {1} {0}".format("=" * 5, num_iters)
             sub_dir = "{0}/num_iters{1}".format(curr_dir, num_iters)
             if not os.path.exists(sub_dir):
@@ -409,5 +409,5 @@ if __name__ == "__main__":
             run_ransac_10_times(num_circle_data, default_param["circle_noise"],
                                 num_noisy_data, default_param["noisy_noise"], res,
                                 num_iters=num_iters, save_dir=sub_dir)
-        plot_result(res, np.arange(1, 220, 20),
+        plot_result(res, np.arange(2, 42, 2),
                     "Iterations", curr_dir)
