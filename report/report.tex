@@ -6,8 +6,9 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
+\usepackage{algorithm} % algorithm
+\usepackage{algpseudocode} % algorithm
+\usepackage{subfig} % sub-figure
 
 % Include other packages here, before hyperref.
 
@@ -80,10 +81,9 @@ In general, RANSAC algorithm follows the algorithm given in Algorithm~\ref{algo:
 
 The problem of noisy circle finding problem is defined as follows. Given two input arrays of pixel locations where $X = [x_{1}, x_{2}, \dots, x_{n}]$, $Y = [y_{1}, y_{2}, \dots, y_{n}]$, $n \geq 3$, find a best-fit circle with center $(x, y)$, and its radius $r$ \cite{NoisyCircleFindingProblem}. An example of the problem is shown in Figure~\ref{fig:circle_finding}
 
-\begin{figure}[!ht]
-   \begin{center}
-      \includegraphics[width=0.6\linewidth]{./images/noisy_circle.png}
-   \end{center}
+\begin{figure}[!htp]
+   \centering
+   \includegraphics[width=0.6\linewidth]{./images/noisy_circle.png}
    \caption{Example of Circle Finding Problem}
    \label{fig:circle_finding}
 \end{figure}
@@ -185,8 +185,161 @@ Combining the two related work described in the Section~\ref{section:related_wor
 \end{algorithm}
 
 
+%-------------------------------------------------------------------------
+\subsection{Experimental Design}
+
+The parameters for the algorithms are the total number of datasets ($total\_num$), the circle to noise data point ratio ($ratio$), the circle points noise variance ($circle\_noise$) and the noisy points variance ($noisy\_noise$).
+
+For each parameter setting, 10 iterations were run. For each iteration, two algorithms are run on the same set of generated data points. The analytic data are collected for each iteration and then averaged and plotted.
+
+The analytic data collected after the experiment are percentage of inliers that were actual circle data (accuracy), runtime, the distance from the fitted model to the inliers, and the differences between the fitted circle's centers and radiuses using two algorithms.
+
+
+%-------------------------------------------------------------------------
+\subsection{Results}
+\label{sec:results}
+
+
+% ===== baseline =====
+\textbf{Baseline Group}
+
+The default parameters we set were $total\_num = 1000$, $ratio = 0.8$, $circle\_noise = 0.1$, $noisy\_noise = 1.0$. Due to the page constraint, only three pairs of results of the two algorithms are shown in Figure~\ref{fig:baseline_results}. See project repository \cite{ProjectRepo} for complete result. Observe that with the same dataset, RANSAC and BAYSAC produce very similar results with slight deviation.
+
+
+% ===== total num =====
+\textbf{Total Number of Data Points}
+
+This part of the experiment tests the effect of the total number of data points. The number of data varies from 100 to 10100. For each epoch, the number of data is increased by 1000. The accuracy, runtime, distance to inliers and difference between two algorithms' fitted circles' centers and radiuses for each epoch is then plotted and shown in Figure~\ref{fig:total_num}.
+
+
+% ===== ratio =====
+\textbf{Circle to Noise Ratio}
+
+This part of the experiment tests the circle to noise data point ratio. The ratio varies from 0.0 (only noise) to 1.0 (only circle). For each epoch, the ratio is increased by 0.1. The accuracy, runtime, distance to inliers and difference between two algorithms' fitted circles' centers and radiuses for each epoch is then plotted and shown in Figure~\ref{fig:ratio}.
+
+
+% ===== num iter =====
+\textbf{Number of Iterations}
+
+This part of the experiment tests the number of iterations. The number of iterations varies from 2 to 40. For each epoch, the number of iterations is increased by 2. The accuracy, runtime, distance to inliers and difference between two algorithms' fitted circles' centers and radiuses for each epoch is then plotted and shown in Figure~\ref{fig:num_iter}.
+
+
+% ===== circle noise =====
+\textbf{Circle Noise}
+
+This part of the experiment tests the circle noise variance. The variance of circle noise varies from 0.0 to 1.0. For each epoch, the variance is increased by 0.2. The accuracy, runtime, distance to inliers and difference between two algorithms' fitted circles' centers and radiuses for each epoch is then plotted and shown in Figure~\ref{fig:circle_noise}.
+
+
+% ===== noisy noise =====
+\textbf{Noisy Noise}
+
+This part of the experiment tests the Noisy points' noise variance. The variance varies from 0.0 to 2.0. For each epoch, the variance is increased by 0.5. The accuracy, runtime, distance to inliers and difference between two algorithms' fitted circles' centers and radiuses for each epoch is then plotted and shown in Figure~\ref{fig:noisy_noise}.
+
+
+% ===== baseline =====
+\begin{figure}[!h]
+   \centering
+   \subfloat[Ransac-0]{\includegraphics[width=0.23\textwidth]{images/baseline/0_ransac.png}}
+   \hfill
+   \subfloat[BAYSAC-0]{\includegraphics[width=0.23\textwidth]{images/baseline/0_baysac.png}}
+   \hfill
+   \subfloat[Ransac-1]{\includegraphics[width=0.23\textwidth]{images/baseline/1_ransac.png}}
+   \hfill
+   \subfloat[BAYSAC-1]{\includegraphics[width=0.23\textwidth]{images/baseline/1_baysac.png}}
+
+   \caption{Baseline Results}
+   \label{fig:baseline_results}
+\end{figure}
+
+
+% ===== total num =====
+\begin{figure}[!h]
+   \centering
+   \subfloat[Accuracy]{\includegraphics[width=0.23\textwidth]{images/total_num/accuracy.png}}
+   \hfill
+   \subfloat[Runtime]{\includegraphics[width=0.23\textwidth]{images/total_num/runtime.png}}
+   \\
+   \subfloat[Inlier Distance]{\includegraphics[width=0.23\textwidth]{images/total_num/inlier_dist.png}}
+   \hfill
+   \subfloat[Center and Radius Difference]{\includegraphics[width=0.23\textwidth]{images/total_num/center_radius_diff.png}}
+
+   \caption{Total Number of Data}
+   \label{fig:total_num}
+\end{figure}
+
+
+% ===== ratio =====
+\begin{figure}[!h]
+   \centering
+   \subfloat[Accuracy]{\includegraphics[width=0.23\textwidth]{images/ratio/accuracy.png}}
+   \hfill
+   \subfloat[Runtime]{\includegraphics[width=0.23\textwidth]{images/ratio/runtime.png}}
+   \\
+   \subfloat[Inlier Distance]{\includegraphics[width=0.23\textwidth]{images/ratio/inlier_dist.png}}
+   \hfill
+   \subfloat[Center and Radius Difference]{\includegraphics[width=0.23\textwidth]{images/ratio/center_radius_diff.png}}
+
+   \caption{Circle to Noise Ratio}
+   \label{fig:ratio}
+\end{figure}
+
+
+% ===== num iter =====
+\begin{figure}[!h]
+   \centering
+   \subfloat[Accuracy]{\includegraphics[width=0.23\textwidth]{images/num_iter/accuracy.png}}
+   \hfill
+   \subfloat[Runtime]{\includegraphics[width=0.23\textwidth]{images/num_iter/runtime.png}}
+   \\
+   \subfloat[Inlier Distance]{\includegraphics[width=0.23\textwidth]{images/num_iter/inlier_dist.png}}
+   \hfill
+   \subfloat[Center and Radius Difference]{\includegraphics[width=0.23\textwidth]{images/num_iter/center_radius_diff.png}}
+
+   \caption{Number of Iterations}
+   \label{fig:num_iter}
+\end{figure}
+
+
+% ===== circle noise =====
+\begin{figure}[!h]
+   \centering
+   \subfloat[Accuracy]{\includegraphics[width=0.23\textwidth]{images/circle_noise/accuracy.png}}
+   \hfill
+   \subfloat[Runtime]{\includegraphics[width=0.23\textwidth]{images/circle_noise/runtime.png}}
+   \\
+   \subfloat[Inlier Distance]{\includegraphics[width=0.23\textwidth]{images/circle_noise/inlier_dist.png}}
+   \hfill
+   \subfloat[Center and Radius Difference]{\includegraphics[width=0.23\textwidth]{images/circle_noise/center_radius_diff.png}}
+
+   \caption{Circle Noise}
+   \label{fig:circle_noise}
+\end{figure}
+
+
+% ===== noisy noise =====
+\begin{figure}[!h]
+   \centering
+   \subfloat[Accuracy]{\includegraphics[width=0.23\textwidth]{images/noisy_noise/accuracy.png}\label{fig:noisy_noise_accuracy}}
+   \hfill
+   \subfloat[Runtime]{\includegraphics[width=0.23\textwidth]{images/noisy_noise/runtime.png}}
+   \\
+   \subfloat[Inlier Distance]{\includegraphics[width=0.23\textwidth]{images/noisy_noise/inlier_dist.png}}
+   \hfill
+   \subfloat[Center and Radius Difference]{\includegraphics[width=0.23\textwidth]{images/noisy_noise/center_radius_diff.png}}
+
+   \caption{Noisy Noise}
+   \label{fig:noisy_noise}
+\end{figure}
+
 %------------------------------------------------------------------------
 \section{Conclusions}
+
+Base on the results shown in Section~\ref{sec:results}, we can see that under the problem of noisy circle detection, RANSAC and BAYSAC performs almost equally well.
+The accuracies and runtimes for two the two algorithms are very similar. Note that for Figure~\ref{fig:noisy_noise_accuracy}, the y-axis scale is enlarged because the accuracies for RANSAC and BAYSAC are very similar.
+
+By looking at the Center and Radius Differences, the results of RANSAC and BAYSAC converges as the number of iterations increases, circle to noise ratio increases (there are more circle points than random noise given the same number of total data points) and circle noise decreases.
+
+In the original BAYSAC paper \cite{BaysacPaper}, the author claimed that BAYSAC could potentially help reduce the failure rate by up to $78\%$ compared to vanilla RANSAC. However, we were not able to show this through our experiment. One potential reason is that the noisy circle detection problem is at a very low dimension, and circle is a very low degree polynomial ($n = 2$). In the future, one possible improvement to this experiment is to compare RANSAC and BAYSAC results for solving a higher dimension problem.
 
 %------------------------------------------------------------------------
 \pagebreak

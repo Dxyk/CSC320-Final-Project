@@ -147,6 +147,24 @@ def plot_result(res, xs, xlabel, curr_dir):
                     pad_inches=0)
     if SHOW:
         plt.show()
+
+    # center radius diff plot
+    plt.clf()
+    plt.plot(xs, res["center_diff"], color="blue", linestyle="-",
+             marker=".", label="center difference")
+    plt.plot(xs, res["radius_diff"], color="red", linestyle="-",
+             marker=".", label="radius difference")
+    plt.title("Center and Radius Differences")
+    plt.xlabel(xlabel)
+    plt.ylabel("Difference")
+    plt.legend(loc="best")
+    plt.margins(0, 0)
+    if SAVE:
+        plt.savefig(curr_dir + "center_radius_diff.png", bbox_inches='tight',
+                    pad_inches=0)
+    if SHOW:
+        plt.show()
+
     return
 
 
@@ -161,6 +179,8 @@ def run_ransac_10_times(num_circle_data, circle_noise,
     baysac_dist = []
     baysac_inlier_dist = []
     baysac_accuracy = []
+    center_diff = []
+    radius_diff = []
 
     total_num_data = num_circle_data + num_noisy_data
     for i in range(10):
@@ -206,6 +226,12 @@ def run_ransac_10_times(num_circle_data, circle_noise,
         else:
             baysac_accuracy.append(0.)
 
+        ransac_x, ransac_y, ransac_r = ransac.get_best_model()
+        baysac_x, baysac_y, baysac_r = baysac.get_best_model()
+        center_diff.append(((ransac_x - baysac_x) ** 2 +
+                            (ransac_y - baysac_y) ** 2) ** 0.5)
+        radius_diff.append(abs(ransac_r - baysac_r))
+
     ransac_runtime = sum(ransac_runtime) / 10
     ransac_dist = sum(ransac_dist) / 10
     ransac_inlier_dist = sum(ransac_inlier_dist) / 10
@@ -215,6 +241,9 @@ def run_ransac_10_times(num_circle_data, circle_noise,
     baysac_dist = sum(baysac_dist) / 10
     baysac_inlier_dist = sum(baysac_inlier_dist) / 10
     baysac_accuracy = sum(baysac_accuracy) / 10
+
+    center_diff = sum(center_diff) / 10
+    radius_diff = sum(radius_diff) / 10
 
     print "RANSAC"
     res["ransac"]["runtime"].append(ransac_runtime)
@@ -235,6 +264,12 @@ def run_ransac_10_times(num_circle_data, circle_noise,
     print "avg inlier dist: {0}".format(baysac_inlier_dist)
     res["baysac"]["accuracy"].append(baysac_accuracy)
     print "avg accuracy: {0}".format(baysac_accuracy)
+
+    print "CENTER RADIUS DIFF"
+    res["center_diff"].append(center_diff)
+    print "avg center diff: {0}".format(center_diff)
+    res["radius_diff"].append(radius_diff)
+    print "avg radius diff: {0}".format(radius_diff)
 
     return
 
@@ -269,7 +304,9 @@ if __name__ == "__main__":
             "dist": [],
             "inlier_dist": [],
             "accuracy": []
-        }
+        },
+        "center_diff": [],
+        "radius_diff": []
     }
 
     # default param dict
