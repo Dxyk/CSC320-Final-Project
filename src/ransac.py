@@ -153,7 +153,7 @@ class Ransac:
 
     def execute_ransac(self):
         """
-        The top level method for executing ransac algorithm
+        The top level method for executing ransac/baysac algorithm
         """
         start_time = time.time()
         for i in range(self.n):

@@ -1,6 +1,8 @@
 import numpy as np
 import numpy.random
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
 import sklearn.datasets
 
 
